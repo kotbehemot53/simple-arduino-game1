@@ -5,8 +5,10 @@
  */
 
 //general constants
+const int SCORE_LED_CNT = 8;
 const int FRAME_DURATION_US = 1000;
-const int FRAMES_IN_CYCLE = 2;
+const int FRAMES_IN_CYCLE = SCORE_LED_CNT;  //TODO: do we need this & frame counter?
+const int BUTTON_COOLDOWN_MS = 1000;
 
 //pins
 const int LEDS_CENTER[2] = {13, 8};
@@ -28,9 +30,9 @@ unsigned long buttonIllegalityTimes[2] = {0, 0};
 int points[2] = {0, 0};
 
 //rendering state
-int frame = 0;
+int frame = 0;  //TODO: do we need this & FRAMES_IN_CYCLE?
 unsigned long frameStartUs = 0;
-unsigned long elapsedMs = 0;
+unsigned long frameStartMs = 0;
 
 /*
  * UTIL FUNCTIONS
@@ -38,7 +40,7 @@ unsigned long elapsedMs = 0;
 
 void initFrame() {
     frameStartUs = micros();
-    elapsedMs = millis();
+    frameStartMs = millis();
 }
 
 void frameUp() {
@@ -61,10 +63,46 @@ void multiplexLeds(const int *ledArray, int ledCount, bool *states) {
     }
 }
 
+void resetScoreTrack(int i) {
+    digitalWrite(SCORE_MRS[i], LOW);
+    delayMicroseconds(100); //TODO: what number is right? should it pause things?
+    digitalWrite(SCORE_MRS[i], HIGH);
+}
+
+void clockPulseScoreTrack(int i) {
+    digitalWrite(SCORE_CLS[i], HIGH);
+    delayMicroseconds(100); //TODO: what number is right? should it pause things?
+    digitalWrite(SCORE_CLS[i], LOW);
+}
+
+void delegalizeButton(int i) {
+    buttonLegality[i] = false;
+    //if there's immunity it will still be illegal in next frame if it's not released
+    // (so you cant exploit the game by constantly holding it) but there'll be no added cooldown
+    if (!buttonImmunity[i]) {
+        buttonIllegalityTimes[i] = frameStartMs;
+    }
+}
+
+bool isButtonLegalizable(int i) {
+    if (frameStartMs - buttonIllegalityTimes[i] > BUTTON_COOLDOWN_MS) {
+        return true;
+    }
+
+    return false;
+}
+
+void tryLegalizeButton(int i) {
+    if (isButtonLegalizable(i)) {
+        buttonLegality[i] = true;
+        buttonImmunity[i] = false;
+    }
+}
+
 void determineLedsCenterStates() {
     //TODO: this is just an example!
-    ledsCenterStates[(elapsedMs / 1000) % 2] = true;
-    ledsCenterStates[((elapsedMs / 1000) + 1) % 2] = false;
+    ledsCenterStates[(frameStartMs / 1000) % 2] = true;
+    ledsCenterStates[((frameStartMs / 1000) + 1) % 2] = false;
 }
 
 
@@ -88,6 +126,56 @@ void readButtonStates() {
     }
 }
 
+//TODO!
+void handleButtonStates() {
+    //TODO: this is just a test
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            if (buttonStates[i][j]) {
+                points[j]++;
+                ledsCenterStates[i] = false;
+            }
+        }
+    }
+
+//    for (int i = 0; i < 2; i++) { //0 = LEFT, 1 = RIGHT
+//        if (!ledsCenterStates[i]) {
+//            for (int j = 0; j < 2; j++) {
+//                if (buttonStates[i][j]) {
+//                    delegalizeButton(j);
+//                } else {
+//                    tryLegalizeButton(j);
+//                }
+//            }
+//        } else {
+//            for (int j = 0; j < 2; j++) {
+//                if (!buttonStates[i][j]) {
+//                    tryLegalizeButton(j);
+//                }
+//                if (buttonStates[j] && buttonLegality[j]) {
+//                    points[j]++;
+//                    buttonImmunity[j] = true;
+//                    centerState = false;
+//                    break;
+//                }
+//            }
+//        }
+//    }
+}
+
+
+bool assertWinState() {
+    for (int i = 0; i < 2; i++) {
+        if (points[i] > SCORE_LED_CNT) {
+//            winAnimation(i);
+            resetGame();
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
  * THE SETUP
  */
@@ -96,6 +184,12 @@ void setup() {
 
     for (int i = 0; i < 2; i++) {
         pinMode(LEDS_CENTER[i], OUTPUT);
+        for (int j = 0; j < 2; j++) {
+            pinMode(BUTTONS[i][j], INPUT);
+        }
+        pinMode(SCORE_CLS[i], OUTPUT);
+        pinMode(SCORE_MRS[i], OUTPUT);
+        pinMode(SCORE_DAS[i], OUTPUT);
     }
 
     Serial.println("oi fegit");
@@ -111,7 +205,33 @@ void loop() {
 //    digitalWrite(LEDS_CENTER[(frame+1) % 2], LOW);
 
     determineLedsCenterStates();
+    readButtonStates();
+    handleButtonStates(); //TODO: do proper handling
+
+    if (assertWinState()) {
+        return;
+    }
+
+    //TODO: rendering as a whole - finish
     multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
+
+    //TODO: render score PROPERLY in separate function
+    for (int i = 0; i < 2; i ++) {
+        if ((frame % SCORE_LED_CNT == 0) && (frame % SCORE_LED_CNT < points[i])) {
+            digitalWrite(SCORE_DAS[i], HIGH);
+        } else {
+            digitalWrite(SCORE_DAS[i], LOW);
+        }
+
+        clockPulseScoreTrack(i);
+
+        if (frame % SCORE_LED_CNT >= points[i]) {
+            resetScoreTrack(i);
+        }
+    }
+
+//    for (int i = 0; )
+
 
     frameUp();
 }
