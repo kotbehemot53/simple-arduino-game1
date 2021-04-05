@@ -9,21 +9,23 @@ const int FRAME_DURATION_US = 1000;
 const int FRAMES_IN_CYCLE = 2;
 
 //pins
-const int LEDS_CENTER[] = {13, 8};
-const int RIGHT_BUTTONS[] = {10, 11};
-const int LEFT_BUTTONS[] = {9, 12};
-const int SCORE_CLS[] = {4, 7};
-const int SCORE_MRS[] = {3, 6};
-const int SCORE_DAS[] = {2, 5};
+const int LEDS_CENTER[2] = {13, 8};
+//const int LEFT_BUTTONS[2] = {9, 12};
+//const int RIGHT_BUTTONS[2] = {10, 11};
+const int BUTTONS[2][2] = {{9, 12}, {10, 11}}; //L/R on top, inside
+const int SCORE_CLS[2] = {4, 7};
+const int SCORE_MRS[2] = {3, 6};
+const int SCORE_DAS[2] = {2, 5};
 
 //game state
-bool ledsCenterStates[] = {true, true};
-bool leftButtonStates[] = {false, false};
-bool rightButtonStates[] = {false, false};
-bool buttonLegality[] = {true, true};
-bool buttonImmunity[] = {false, false};
-unsigned long buttonIllegalityTimes[] = {0, 0};
-int points[] = {0, 0};
+bool ledsCenterStates[2] = {true, true};
+//bool leftButtonStates[] = {false, false};
+//bool rightButtonStates[] = {false, false};
+bool buttonStates[2][2] = {{false, false}, {false, false}}; //L/R on top, inside
+bool buttonLegality[2] = {true, true};
+bool buttonImmunity[2] = {false, false};
+unsigned long buttonIllegalityTimes[2] = {0, 0};
+int points[2] = {0, 0};
 
 //rendering state
 int frame = 0;
@@ -68,8 +70,9 @@ void determineLedsCenterStates() {
 
 void resetGame() {
     for (int i = 0; i < 2; i++) {
-        leftButtonStates[i] = false;
-        rightButtonStates[i] = false;
+        for (int j = 0; j < 2; j++) {
+            buttonStates[i][j] = false;
+        }
         buttonLegality[i] = false;
         buttonImmunity[i] = false;
         points[i] = 0;
@@ -79,8 +82,9 @@ void resetGame() {
 
 void readButtonStates() {
     for (int i = 0; i < 2; i++) {
-        leftButtonStates[i] = digitalRead(LEFT_BUTTONS[i]);
-        rightButtonStates[i] = digitalRead(RIGHT_BUTTONS[i]);
+        for (int j = 0; j < 2; j++) {
+            buttonStates[i][j] = digitalRead(BUTTONS[i][j]);
+        }
     }
 }
 
