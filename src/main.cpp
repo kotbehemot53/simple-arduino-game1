@@ -4,16 +4,6 @@ const int LEDS_CENTER[] = {13, 8};
 
 int frame = 0;
 
-void setup() {
-    Serial.begin(115200);
-
-    for (int i = 0; i < 2; i++) {
-        pinMode(LEDS_CENTER[i], OUTPUT);
-    }
-
-    Serial.println("oi fegit");
-}
-
 void frameUp() {
     frame++;
 
@@ -22,6 +12,16 @@ void frameUp() {
     }
 
     delay(1000);
+}
+
+void setup() {
+    Serial.begin(115200);
+
+    for (int i = 0; i < 2; i++) {
+        pinMode(LEDS_CENTER[i], OUTPUT);
+    }
+
+    Serial.println("oi fegit");
 }
 
 void loop() {
