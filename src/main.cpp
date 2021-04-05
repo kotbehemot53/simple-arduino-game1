@@ -28,12 +28,17 @@ void frameUp() {
     delayMicroseconds(delayLength > 0 ? delayLength : 1);
 }
 
-void multiplexLed(const int ledArray[], int ledCount, bool states[]) {
+void multiplexLeds(const int *ledArray, int ledCount, bool *states) {
     int currentLed = frame % ledCount;
     digitalWrite(ledArray[currentLed], states[currentLed]);
     for (int i = 1; i < ledCount; i++) {
         digitalWrite(ledArray[(frame + i) % ledCount], LOW);
     }
+}
+
+void determineLedsCenterStates() {
+    ledsCenterStates[(elapsedMs / 1000) % 2] = true;
+    ledsCenterStates[((elapsedMs / 1000) + 1) % 2] = false;
 }
 
 void setup() {
@@ -52,9 +57,8 @@ void loop() {
 //    digitalWrite(LEDS_CENTER[frame % 2], HIGH);
 //    digitalWrite(LEDS_CENTER[(frame+1) % 2], LOW);
 
-    ledsCenterStates[(elapsedMs / 1000) % 2] = true;
-    ledsCenterStates[((elapsedMs / 1000) + 1) % 2] = false;
-    multiplexLed(LEDS_CENTER, 2, ledsCenterStates);
+    determineLedsCenterStates();
+    multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
 
     frameUp();
 }
