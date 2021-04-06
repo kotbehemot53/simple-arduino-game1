@@ -240,6 +240,7 @@ void loop() {
     multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
 
     //TODO: render score PROPERLY in separate function
+    //TODO: 1 too many led lights up, and the topmost is dimmed
     for (int playerIdx = 0; playerIdx < 2; playerIdx ++) {
         if ((frame % SCORE_LED_CNT == 0) && (frame % SCORE_LED_CNT < points[playerIdx])) {
             digitalWrite(SCORE_DAS[playerIdx], HIGH);
