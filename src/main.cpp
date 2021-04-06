@@ -7,7 +7,7 @@
 //general constants
 const int SCORE_LED_CNT = 8;
 const int FRAME_DURATION_US = 1000;
-const int FRAMES_IN_CYCLE = SCORE_LED_CNT + 1;  //TODO: do we need this & frame counter?
+const int FRAMES_IN_CYCLE = SCORE_LED_CNT + 1;
 const int BUTTON_COOLDOWN_MS = 1000;
 
 //pins
@@ -34,8 +34,9 @@ int frame = 0;  //TODO: do we need this & FRAMES_IN_CYCLE?
 unsigned long frameStartUs = 0;
 unsigned long frameStartMs = 0;
 
+
 /*
- * UTIL FUNCTIONS
+ * UTIL FUNCTIONS - VISUALS
  */
 
 void initFrame() {
@@ -62,14 +63,6 @@ void frameUp() {
     delayMicroseconds(delayLength > 0 ? delayLength : 1);
 }
 
-void multiplexLeds(const int *ledArray, int ledCount, bool *states) {
-    int currentLed = frame % ledCount;
-    digitalWrite(ledArray[currentLed], states[currentLed]);
-    for (int i = 1; i < ledCount; i++) {
-        digitalWrite(ledArray[(frame + i) % ledCount], LOW);
-    }
-}
-
 void resetScoreTrackWalkingPulse(int playerIdx) {
     digitalWrite(SCORE_MRS[playerIdx], LOW);
     delayMicroseconds(100); //TODO: what number is right? should it pause things?
@@ -81,6 +74,39 @@ void stepScoreTrackWalkingPulse(int playerIdx) {
     delayMicroseconds(100); //TODO: what number is right? should it pause things?
     digitalWrite(SCORE_CLS[playerIdx], LOW);
 }
+
+void multiplexLeds(const int *ledArray, int ledCount, bool *states) {
+    int currentLed = frame % ledCount;
+    digitalWrite(ledArray[currentLed], states[currentLed]);
+    for (int i = 1; i < ledCount; i++) {
+        digitalWrite(ledArray[(frame + i) % ledCount], LOW);
+    }
+}
+
+void multiplexScoresViaShiftRegister() {
+    for (int playerIdx = 0; playerIdx < 2; playerIdx ++) {
+        if (frame % (SCORE_LED_CNT + 1) >= points[playerIdx]) {
+            resetScoreTrackWalkingPulse(playerIdx);
+        }
+
+        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && buttonLegality[playerIdx]) {
+            digitalWrite(SCORE_DAS[playerIdx], HIGH);
+        } else {
+            digitalWrite(SCORE_DAS[playerIdx], LOW);
+        }
+
+        stepScoreTrackWalkingPulse(playerIdx);
+    }
+}
+
+void renderVisuals() {
+    multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
+    multiplexScoresViaShiftRegister();
+}
+
+/*
+ * UTIL FUNCTIONS - GAME STATE
+ */
 
 void delegalizeButton(int playerIdx) {
     buttonLegality[playerIdx] = false;
@@ -152,7 +178,6 @@ void readButtonStates() {
     }
 }
 
-//TODO!
 void handleButtonStates() {
     for (int playerIdx = 0; playerIdx < 2; playerIdx++) { //for each led
         if (!buttonStates[playerIdx][0] && !buttonStates[playerIdx][1]) { //legalize player if BOTH buttons are not pressed
@@ -179,32 +204,7 @@ void handleButtonStates() {
             }
         }
     }
-
-//    for (int i = 0; i < 2; i++) { //0 = LEFT, 1 = RIGHT
-//        if (!ledsCenterStates[i]) {
-//            for (int j = 0; j < 2; j++) {
-//                if (buttonStates[i][j]) {
-//                    delegalizeButton(j);
-//                } else {
-//                    tryLegalizeButton(j);
-//                }
-//            }
-//        } else {
-//            for (int j = 0; j < 2; j++) {
-//                if (!buttonStates[i][j]) {
-//                    tryLegalizeButton(j);
-//                }
-//                if (buttonStates[j] && buttonLegality[j]) {
-//                    points[j]++;
-//                    buttonImmunity[j] = true;
-//                    centerState = false;
-//                    break;
-//                }
-//            }
-//        }
-//    }
 }
-
 
 bool assertWinState() {
     for (int playerIdx = 0; playerIdx < 2; playerIdx++) {
@@ -246,38 +246,15 @@ void setup() {
 void loop() {
     initFrame();
 
-//    digitalWrite(LEDS_CENTER[frame % 2], HIGH);
-//    digitalWrite(LEDS_CENTER[(frame+1) % 2], LOW);
-
     determineLedsCenterStates();
     readButtonStates();
-    handleButtonStates(); //TODO: do proper handling
+    handleButtonStates();
 
     if (assertWinState()) {
         return;
     }
 
-    //TODO: rendering as a whole - finish
-    multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
-
-    //TODO: render score PROPERLY in separate function
-    //TODO: 1 too many led lights up, and the topmost is dimmed
-    for (int playerIdx = 0; playerIdx < 2; playerIdx ++) {
-        if (frame % (SCORE_LED_CNT + 1) >= points[playerIdx]) {
-            resetScoreTrackWalkingPulse(playerIdx);
-        }
-
-        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && buttonLegality[playerIdx]) {
-            digitalWrite(SCORE_DAS[playerIdx], HIGH);
-        } else {
-            digitalWrite(SCORE_DAS[playerIdx], LOW);
-        }
-
-        stepScoreTrackWalkingPulse(playerIdx);
-    }
-
-//    for (int i = 0; )
-
+    renderVisuals();
 
     frameUp();
 }
