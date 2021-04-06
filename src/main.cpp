@@ -267,7 +267,7 @@ void loop() {
             resetScoreTrackWalkingPulse(playerIdx);
         }
 
-        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx]) {
+        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && isButtonLegalizable(playerIdx)) {
             digitalWrite(SCORE_DAS[playerIdx], HIGH);
         } else {
             digitalWrite(SCORE_DAS[playerIdx], LOW);
