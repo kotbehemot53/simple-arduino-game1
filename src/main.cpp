@@ -87,8 +87,10 @@ void delegalizeButton(int playerIdx) {
     //if there's immunity it will still be illegal in next frame if it's not released
     // (so you cant exploit the game by constantly holding it) but there'll be no added cooldown
     if (!buttonImmunity[playerIdx]) {
+//        Serial.println("no immunity!");
         buttonIllegalityTimes[playerIdx] = frameStartMs;
     } else {
+//        Serial.println("immunity!");
         buttonIllegalityTimes[playerIdx] = 0;
     }
 }
@@ -105,6 +107,7 @@ void tryLegalizeButton(int playerIdx) {
     if (!buttonLegality[playerIdx] && isButtonLegalizable(playerIdx)) {
         buttonLegality[playerIdx] = true;
         buttonImmunity[playerIdx] = false;
+//        Serial.println("Legalized, immunity reset");
     }
 }
 
@@ -113,9 +116,9 @@ void determineLedsCenterStates() {
         if (random(100000) > 99960) {
             byte ledToSet = random(2);
 
-            //TODO: this is debug
-            Serial.print("settin led ");
-            Serial.println(ledToSet);
+            //this is debug
+//            Serial.print("settin led ");
+//            Serial.println(ledToSet);
 
             ledsCenterStates[ledToSet] = true;
         }
@@ -166,10 +169,10 @@ void handleButtonStates() {
                     points[playerIdx]++;
                     buttonImmunity[playerIdx] = true;
                     ledsCenterStates[ledIdx] = false;
-//                    delegalizeButton(playerIdx); //just for 1 frame
+//                    delegalizeButton(playerIdx); //just for 1 frame - not necessary dude won't be able to release it < 1ms
 
-                    //TODO: this is debug
-                    Serial.println(points[playerIdx]);
+//                    //this is debug
+//                    Serial.println(points[playerIdx]);
 
                     return; //don't allow the other player to get a point if he pressed the btn simultaneously (is it possible??)
                 }
