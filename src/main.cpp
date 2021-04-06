@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 //TODO: PWM DIMMING
+//TODO: autosleep
 
 /*
  * CONSTANTS & VARIABLES
@@ -171,7 +172,7 @@ void tryLegalizeButton(int playerIdx) {
 
 void determineLedsCenterStates() {
     if (!ledsCenterStates[0] && !ledsCenterStates[1]) {
-        if (random(100000) > 99960) {
+        if (random(100000) > 99900) {
             byte ledToSet = random(2);
 
             //this is debug
