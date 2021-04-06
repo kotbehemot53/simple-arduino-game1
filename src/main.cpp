@@ -7,7 +7,7 @@
 //general constants
 const int SCORE_LED_CNT = 8;
 const int FRAME_DURATION_US = 1000;
-const int FRAMES_IN_CYCLE = SCORE_LED_CNT;  //TODO: do we need this & frame counter?
+const int FRAMES_IN_CYCLE = SCORE_LED_CNT + 1;  //TODO: do we need this & frame counter?
 const int BUTTON_COOLDOWN_MS = 1000;
 
 //pins
@@ -263,17 +263,17 @@ void loop() {
     //TODO: render score PROPERLY in separate function
     //TODO: 1 too many led lights up, and the topmost is dimmed
     for (int playerIdx = 0; playerIdx < 2; playerIdx ++) {
-        if ((frame % SCORE_LED_CNT == 0) && (frame % SCORE_LED_CNT < points[playerIdx])) {
+        if (frame % (SCORE_LED_CNT + 1) >= points[playerIdx]) {
+            resetScoreTrackWalkingPulse(playerIdx);
+        }
+
+        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx]) {
             digitalWrite(SCORE_DAS[playerIdx], HIGH);
         } else {
             digitalWrite(SCORE_DAS[playerIdx], LOW);
         }
 
         stepScoreTrackWalkingPulse(playerIdx);
-
-        if (frame % SCORE_LED_CNT >= points[playerIdx]) {
-            resetScoreTrackWalkingPulse(playerIdx);
-        }
     }
 
 //    for (int i = 0; )
