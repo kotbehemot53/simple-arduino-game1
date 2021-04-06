@@ -20,7 +20,7 @@ const int SCORE_MRS[2] = {3, 6};
 const int SCORE_DAS[2] = {2, 5};
 
 //game state
-bool ledsCenterStates[2] = {true, true};
+bool ledsCenterStates[2] = {false, false};
 //bool leftButtonStates[] = {false, false};
 //bool rightButtonStates[] = {false, false};
 bool buttonStates[2][2] = {{false, false}, {false, false}}; //L/R on top, inside
@@ -52,6 +52,13 @@ void frameUp() {
 
     unsigned long frameEndUs = micros();
     int delayLength = FRAME_DURATION_US - (frameEndUs - frameStartUs);
+
+    //this is debug
+//    if (delayLength < 100) {
+//        Serial.print("Delay length ");
+//        Serial.println(delayLength);
+//    }
+
     delayMicroseconds(delayLength > 0 ? delayLength : 1);
 }
 
@@ -100,9 +107,21 @@ void tryLegalizeButton(int playerIdx) {
 }
 
 void determineLedsCenterStates() {
-    //TODO: this is just an example!
-    ledsCenterStates[(frameStartMs / 1000) % 2] = true;
-    ledsCenterStates[((frameStartMs / 1000) + 1) % 2] = false;
+    if (!ledsCenterStates[0] && !ledsCenterStates[1]) {
+        if (random(100000) > 99960) {
+            byte ledToSet = random(2);
+
+            //TODO: this is debug
+            Serial.print("settin led ");
+            Serial.println(ledToSet);
+
+            ledsCenterStates[ledToSet] = true;
+        }
+    }
+
+//    this is just an example!
+//    ledsCenterStates[(frameStartMs / 1000) % 2] = true;
+//    ledsCenterStates[((frameStartMs / 1000) + 1) % 2] = false;
 }
 
 
@@ -147,6 +166,7 @@ void handleButtonStates() {
 
                 if (buttonStates[playerIdx][ledIdx] && buttonLegality[playerIdx]) {
 
+                    delegalizeButton(playerIdx);
                     points[playerIdx]++;
                     buttonImmunity[playerIdx] = true;
                     ledsCenterStates[ledIdx] = false;
@@ -215,6 +235,7 @@ void setup() {
     for (int ledIdx = 0; ledIdx < 2; ledIdx++) {
         pinMode(LEDS_CENTER[ledIdx], OUTPUT);
     }
+    randomSeed(analogRead(0));
 
     Serial.println("oi fegit");
 }
