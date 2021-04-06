@@ -88,6 +88,8 @@ void delegalizeButton(int playerIdx) {
     // (so you cant exploit the game by constantly holding it) but there'll be no added cooldown
     if (!buttonImmunity[playerIdx]) {
         buttonIllegalityTimes[playerIdx] = frameStartMs;
+    } else {
+        buttonIllegalityTimes[playerIdx] = 0;
     }
 }
 
@@ -100,7 +102,7 @@ bool isButtonLegalizable(int playerIdx) {
 }
 
 void tryLegalizeButton(int playerIdx) {
-    if (isButtonLegalizable(playerIdx)) {
+    if (!buttonLegality[playerIdx] && isButtonLegalizable(playerIdx)) {
         buttonLegality[playerIdx] = true;
         buttonImmunity[playerIdx] = false;
     }
@@ -130,7 +132,7 @@ void resetGame() {
         for (int ledIdx = 0; ledIdx < 2; ledIdx++) {
             buttonStates[playerIdx][ledIdx] = false;
         }
-        buttonLegality[playerIdx] = false;
+        buttonLegality[playerIdx] = true;
         buttonImmunity[playerIdx] = false;
         points[playerIdx] = 0;
     }
@@ -150,26 +152,21 @@ void readButtonStates() {
 //TODO!
 void handleButtonStates() {
     for (int playerIdx = 0; playerIdx < 2; playerIdx++) { //for each led
+        if (!buttonStates[playerIdx][0] && !buttonStates[playerIdx][1]) { //legalize player if BOTH buttons are not pressed
+            tryLegalizeButton(playerIdx);
+        }
         for (int ledIdx = 0; ledIdx < 2; ledIdx++) { //for each playerIdx
             if (!ledsCenterStates[ledIdx]) {
                 if (buttonStates[playerIdx][ledIdx]) {
                     delegalizeButton(playerIdx);
-                } else {
-                    tryLegalizeButton(playerIdx);
                 }
-
             } else {
-                //TODO: do for BOTH buttons together!! now legality of one button can override illegality of another!
-                if (!buttonStates[playerIdx][ledIdx]) {
-                    tryLegalizeButton(playerIdx);
-                }
-
                 if (buttonStates[playerIdx][ledIdx] && buttonLegality[playerIdx]) {
 
-                    delegalizeButton(playerIdx);
                     points[playerIdx]++;
                     buttonImmunity[playerIdx] = true;
                     ledsCenterStates[ledIdx] = false;
+//                    delegalizeButton(playerIdx); //just for 1 frame
 
                     //TODO: this is debug
                     Serial.println(points[playerIdx]);
@@ -267,7 +264,7 @@ void loop() {
             resetScoreTrackWalkingPulse(playerIdx);
         }
 
-        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && isButtonLegalizable(playerIdx)) {
+        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && buttonLegality[playerIdx]) {
             digitalWrite(SCORE_DAS[playerIdx], HIGH);
         } else {
             digitalWrite(SCORE_DAS[playerIdx], LOW);
