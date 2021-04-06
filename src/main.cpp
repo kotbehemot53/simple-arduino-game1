@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+//TODO: PWM DIMMING
+
 /*
  * CONSTANTS & VARIABLES
  */
@@ -75,32 +77,62 @@ void stepScoreTrackWalkingPulse(int playerIdx) {
     digitalWrite(SCORE_CLS[playerIdx], LOW);
 }
 
-void multiplexLeds(const int *ledArray, int ledCount, bool *states) {
-    int currentLed = frame % ledCount;
+void multiplexLeds(const int *ledArray, int ledCount, bool *states, int frameNumber) {
+    int currentLed = frameNumber % ledCount;
     digitalWrite(ledArray[currentLed], states[currentLed]);
     for (int i = 1; i < ledCount; i++) {
-        digitalWrite(ledArray[(frame + i) % ledCount], LOW);
+        digitalWrite(ledArray[(frameNumber + i) % ledCount], LOW);
     }
+}
+
+void multiplexCustomScoreViaShiftRegister(int playerIdx, byte playerScore, bool displayCondition, int frameNumber) {
+    if (frameNumber % (SCORE_LED_CNT + 1) >= playerScore) {
+        resetScoreTrackWalkingPulse(playerIdx);
+    }
+
+    if ((frameNumber % (SCORE_LED_CNT + 1) == 0) && playerScore && displayCondition) {
+        digitalWrite(SCORE_DAS[playerIdx], HIGH);
+    } else {
+        digitalWrite(SCORE_DAS[playerIdx], LOW);
+    }
+
+    stepScoreTrackWalkingPulse(playerIdx);
 }
 
 void multiplexScoresViaShiftRegister() {
     for (int playerIdx = 0; playerIdx < 2; playerIdx ++) {
-        if (frame % (SCORE_LED_CNT + 1) >= points[playerIdx]) {
-            resetScoreTrackWalkingPulse(playerIdx);
-        }
+        multiplexCustomScoreViaShiftRegister(playerIdx, points[playerIdx], buttonLegality[playerIdx], frame);
+    }
+}
 
-        if ((frame % (SCORE_LED_CNT + 1) == 0) && points[playerIdx] && buttonLegality[playerIdx]) {
-            digitalWrite(SCORE_DAS[playerIdx], HIGH);
-        } else {
-            digitalWrite(SCORE_DAS[playerIdx], LOW);
-        }
+void winAnimation(int winnerIdx) {
+    //dim the loser to show who won
+    for (int playerIdx = 0; playerIdx < 2; playerIdx++) {
+        resetScoreTrackWalkingPulse(playerIdx);
+    }
 
-        stepScoreTrackWalkingPulse(playerIdx);
+    //go up the ladder
+    for (int i = 0; i < 9; i++) {
+        multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
+        delay(500-i*30);
+    }
+
+    //blink the ladder and the center leds
+    bool centStates[2];
+    for (int i = 0; i < 1800; i++) {
+        //ladder blink
+        multiplexCustomScoreViaShiftRegister(winnerIdx, 8, (i/300) % 2 == 0, i);
+        //center leds blink (interchangeable)
+        centStates[0] = (i/300) % 2 == 0;
+        centStates[1] = !centStates[0];
+        multiplexLeds(LEDS_CENTER, 2, centStates, i);
+
+        delay(1);
     }
 }
 
 void renderVisuals() {
-    multiplexLeds(LEDS_CENTER, 2, ledsCenterStates);
+    multiplexLeds(LEDS_CENTER, 2, ledsCenterStates, frame);
     multiplexScoresViaShiftRegister();
 }
 
@@ -209,7 +241,7 @@ void handleButtonStates() {
 bool assertWinState() {
     for (int playerIdx = 0; playerIdx < 2; playerIdx++) {
         if (points[playerIdx] > SCORE_LED_CNT) {
-//            winAnimation(playerIdx);
+            winAnimation(playerIdx);
             resetGame();
             return true;
         }
