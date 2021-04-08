@@ -166,10 +166,26 @@ void winAnimation(int winnerIdx) {
         resetScoreTrackWalkingPulse(playerIdx);
     }
 
-    //go up the ladder
+    //go up the ladder 5x faster & faster
     for (int i = 0; i < 9; i++) {
         multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
-        delay(500-i*30);
+        delay(300-i*25);
+    }
+    for (int i = 0; i < 9; i++) {
+        multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
+        delay(100-i*10);
+    }
+    for (int i = 0; i < 9; i++) {
+        multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
+        delay(50-i*5);
+    }
+    for (int i = 0; i < 9; i++) {
+        multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
+        delay(50-i*5);
+    }
+    for (int i = 0; i < 9; i++) {
+        multiplexCustomScoreViaShiftRegister(winnerIdx, i+1, true, i);
+        delay(50-i*5);
     }
 
     //blink the ladder and the center leds
