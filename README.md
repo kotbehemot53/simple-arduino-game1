@@ -10,6 +10,11 @@ or do it before any LED lights up, you get 1s cooldown when you can't do anythin
 The LEDs in the middle from green to red are point tracks for both players. When you get max points + 1 you win.
 When a point track goes blank, it means that the cooldown is in progress.
 
+Schematic
+---------
+
+`//TODO: put a link to the schematic here!`
+
 Disclaimer
 ----------
 
@@ -20,19 +25,19 @@ Pin mapping
 -----------
 
 ```
-LEFT   DIP pin  Arduino pin
-blu    19       13
-cp     6        4
-mr     5        3
-da     4        2
-btnu   15       9
-btnd   16       10
+LEFT SIDE       DIP pin  Arduino pin
+top led l       19       13
+shift reg clk   6        4
+shift reg /r    5        3
+shift reg data  4        2
+btn up/right    15       9
+btn down/left   16       10
 
-RIGHT  DIP pin  Arduino pin
-blu    14       8
-cp     13       7
-mr     12       6
-da     11       5
-btnu   17       11
-btnd   18       12
+RIGHT SIDE      DIP pin  Arduino pin
+top led r       14       8
+shift reg clk   13       7
+shift reg /r    12       6
+shift reg data  11       5
+btn up/right    17       11
+btn down/left   18       12
 ```
