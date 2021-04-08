@@ -1,6 +1,8 @@
 A LITTLE GAME
 =============
 
+![IMG_20210407_180206](https://user-images.githubusercontent.com/14978209/114098914-50b44180-98c2-11eb-9791-515de6bbeb0b.jpg)
+
 Rules
 -----
 
