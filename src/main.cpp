@@ -14,7 +14,7 @@ const int FRAMES_IN_CYCLE = SCORE_LED_CNT + 1; //point track shift registers cyc
 const int BUTTON_COOLDOWN_MS = 1000;           //cooldown period on wrong button press
 const int SERIAL_REG_CLK_PULSE_LEN_US = 100;   //clock/reset pulse length for the shift registers
                                                // TODO: make sure if the period can't be shorter
-const long CENTER_LED_PROBABILITY = 99900;     //probability * 100000 (so 99900 is 0,999) of one of the top LEDs lighting
+const long CENTER_LED_PROBABILITY = 99900;     //probability * 100000 (so 99900 is 0,999) of one of the top LEDs NOT lighting
                                                // up in the current frame; current number chosen experimentally, so that
                                                // intervals aren't so long that the game is boring but there still is some
                                                // degree of suspense
