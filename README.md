@@ -17,6 +17,22 @@ Schematic
 
 `//TODO: put a link to the schematic here!`
 
+Hardware platform
+-----------------
+
+Atmega328P with Arduino bootloader.
+
+Setup
+-----
+
+### Platformio + any IDE ###
+
+You can use the project as is - it contains platformio.ini, so it should build and upload out of the box.
+
+### Arduino IDE ###
+
+You may copy the contents of `main.cpp` (except `#include <Arduino.h>`) and paste it to an empty sketch (`.ino` file) and it should work.
+
 Disclaimer
 ----------
 
