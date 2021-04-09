@@ -20,7 +20,7 @@ Schematic
 Hardware platform
 -----------------
 
-Atmega328P with Arduino bootloader.
+Atmega328P with Arduino bootloader (Arduino UNO platform).
 
 Setup
 -----
@@ -31,7 +31,7 @@ You can use the project as is - it contains platformio.ini, so it should build a
 
 ### Arduino IDE ###
 
-You may copy the contents of `main.cpp` (except `#include <Arduino.h>`) and paste it to an empty sketch (`.ino` file) and it should work.
+You may copy the contents of `main.cpp` (except `#include <Arduino.h>`) and paste it to an empty sketch (`.ino` file) and it should work. Set platform to Arduino UNO.
 
 Disclaimer
 ----------
