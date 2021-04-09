@@ -48,8 +48,8 @@ top led l       19       13
 shift reg clk   6        4
 shift reg /r    5        3
 shift reg data  4        2
-btn up/right    15       9
-btn down/left   16       10
+btn up/left     15       9
+btn down/right  16       10
 
 RIGHT SIDE      DIP pin  Arduino pin
 top led r       14       8
