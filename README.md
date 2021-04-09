@@ -49,12 +49,19 @@ Due to the nature of this solution, it's crucial to connect the LEDs to the shif
 It's impossible to light up the score track LEDs in any other order (would be possible if a buffered register was used).
 
 Even though the 2 top LEDs are connected to separate pins, they are still multiplexed to conserve energy from the batteries
-(the whole thing still draws around 100 mA at 3V when all LEDs are lit).
+(the whole thing still draws around 100 mA at 3V battery input when all LEDs are lit).
 
 The green-red LEDs in the score tracks use only 120 ohm resistors, because I wanted them to be as bright as possible (reaching ~20-25 mA of current)
 due to their short duty cycles caused by multiplexing over 8 LEDs in each track.
 The blue LEDs, on the other hand, use 1,5k ohm resistors, because they were much brighter than others in my case (even when there was no multiplexing). 
 This has a benefit of conserving battery power.
+
+The 2 UART pins allow for programming the Atmega via a USB-to-serial adapter, directly from your PC, without moving
+it to an Arduino board. Bear in mind though, that when your IDE starts uploading code, you must manually 
+reset the microcontroller (using SW5).
+
+For power supply I used a Pololu step-up/step-down voltage regulator with 5V output together with 2 AA batteries,
+but any other setup providing 5V on output will do, provided that it can handle up to 0,3W power draw.
 
 
 Disclaimer
