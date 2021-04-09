@@ -63,7 +63,7 @@ reset the microcontroller (using SW5).
 For power supply I used a Pololu step-up/step-down voltage regulator with 5V output together with 2 AA batteries,
 but any other setup providing 5V on output will do, provided that it can handle up to 0,3W power draw.
 
-Possibly adding a 0.1uF decoupling capacitors between Vcc & GND right next to Atmega pins could improve stability, but
+Possibly adding some 0.1uF decoupling capacitors between Vcc & GND right next to Atmega pins could improve stability, but
 I don't think it's necessary in this particular build. No random resets were observed.
 
 
