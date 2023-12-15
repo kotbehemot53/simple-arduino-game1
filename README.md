@@ -17,9 +17,9 @@ When a point track goes blank, it means that the cooldown is in progress.
 Schematic
 ---------
 
-![Schematic_SimpleArduinoGame1_2021-04-10_2](https://user-images.githubusercontent.com/14978209/114249274-744abb00-999a-11eb-8a0f-2e76648b3b6f.png)
-[Schematic_SimpleArduinoGame1_2021-04-10_2.pdf](https://github.com/kotbehemot53/simple-arduino-game1/files/6288854/Schematic_SimpleArduinoGame1_2021-04-10_2.pdf)
+Bear in mind that the current version of the schematic contains some mistakes (they are listed on top in the "TODO" section)!
 
+![Schematic_SimpleArduinoGame1_2023-12-15](https://raw.githubusercontent.com/kotbehemot53/simple-arduino-game1/master/schematic/Schematic_jurek_a2_2023-12-15.png)
 
 Hardware platform
 -----------------
